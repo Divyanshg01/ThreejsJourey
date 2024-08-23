@@ -1,0 +1,21 @@
+{
+    "name": "lesson03",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+        "dev": "vite"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "dependencies": {
+        "three": "^0.167.1",
+        "vite": "^5.4.2"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.9.0",
+        "eslint": "^9.9.0",
+        "globals": "^15.9.0"
+    }
+}
