@@ -19,6 +19,7 @@ const scene = new THREE.Scene();
 debugObject.depthColor = "#1727b9";
 debugObject.surfaceColor = "#7192eb";
 /**
+ *
  * Water
  */
 // Geometry
@@ -37,6 +38,7 @@ const waterMaterial = new THREE.ShaderMaterial({
         uColorOffset: { value: 0.159 },
         uColorMultiplier: { value: 5.151 },
     },
+    side: THREE.DoubleSide,
 });
 gui
     .add(waterMaterial.uniforms.uBigWavesElevation, "value")
