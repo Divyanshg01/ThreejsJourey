@@ -101,16 +101,11 @@ renderer.setClearColor(debugObject.clearColor);
 /**
  *  Base Geometry
  */
-
-const gltf = await gltfLoader.loadAsync("./model.glb");
-
 //s1
-
 const baseGeometry = {};
 
 //s2
-// baseGeometry.instance = new THREE.SphereGeometry(3);
-baseGeometry.instance = gltf.scene.children[0].geometry;
+baseGeometry.instance = new THREE.SphereGeometry(3);
 baseGeometry.count = baseGeometry.instance.attributes.position.count; // these are amount of particles or vertices
 
 //s3
@@ -142,7 +137,7 @@ for (let i = 0; i < baseGeometry.count; i++) {
         baseGeometry.instance.attributes.position.array[i3 + 1];
     basePaticleTexture.image.data[i4 + 2] =
         baseGeometry.instance.attributes.position.array[i3 + 2];
-    basePaticleTexture.image.data[i4 + 3] = Math.random();
+    basePaticleTexture.image.data[i4 + 3] = 0;
 }
 // console.log(basePaticleTexture.image.data);
 //s14 -> update the particles.glsl
@@ -159,12 +154,6 @@ gpgpu.particlesVariable = gpgpu.computation.addVariable(
 gpgpu.computation.setVariableDependencies(gpgpu.particlesVariable, [
     gpgpu.particlesVariable,
 ]);
-
-gpgpu.particlesVariable.material.uniforms.uTime = new THREE.Uniform(0);
-gpgpu.particlesVariable.material.uniforms.uDeltaTime = new THREE.Uniform(0);
-gpgpu.particlesVariable.material.uniforms.uBase = new THREE.Uniform(
-    basePaticleTexture,
-);
 
 //s9
 gpgpu.computation.init();
@@ -197,7 +186,6 @@ const particles = {};
 
 //s19
 const particleUVarray = new Float32Array(baseGeometry.count * 2);
-const sizesArray = new Float32Array(baseGeometry.count);
 for (let y = 0; y < gpgpu.size; y++) {
     for (let x = 0; x < gpgpu.size; x++) {
         const i = y * gpgpu.size + x;
@@ -208,8 +196,6 @@ for (let y = 0; y < gpgpu.size; y++) {
 
         particleUVarray[i2 + 0] = uvX;
         particleUVarray[i2 + 1] = uvY;
-
-        sizesArray[i] = Math.random();
     }
 }
 // Geometry
@@ -225,22 +211,13 @@ particles.geometry.setAttribute(
     "aParticlesUv",
     new THREE.BufferAttribute(particleUVarray, 2),
 );
-particles.geometry.setAttribute(
-    "aSizes",
-    new THREE.BufferAttribute(sizesArray, 1),
-);
-
-particles.geometry.setAttribute(
-    "aColor",
-    baseGeometry.instance.attributes.color,
-);
 
 // Material
 particles.material = new THREE.ShaderMaterial({
     vertexShader: particlesVertexShader,
     fragmentShader: particlesFragmentShader,
     uniforms: {
-        uSize: new THREE.Uniform(0.04),
+        uSize: new THREE.Uniform(0.4),
         uResolution: new THREE.Uniform(
             new THREE.Vector2(
                 sizes.width * sizes.pixelRatio,
@@ -290,8 +267,6 @@ const tick = () => {
     particles.material.uniforms.uParticlesTexture.value =
         gpgpu.computation.getCurrentRenderTarget(gpgpu.particlesVariable).texture;
 
-    gpgpu.particlesVariable.material.uniforms.uTime.value = elapsedTime;
-    gpgpu.particlesVariable.material.uniforms.uDeltaTime.value = deltaTime;
     // Render normal scene
     renderer.render(scene, camera);
 
